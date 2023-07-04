@@ -17,9 +17,5 @@
 }
 
 body {
-  background: linear-gradient(
-    250deg,
-    rgba(0, 114, 245, 0.1),
-    rgba(0, 0, 0, 0)
-  );
+  background: linear-gradient(250deg, rgba(0, 114, 245, 0.1), rgba(0, 0, 0, .01));
 }

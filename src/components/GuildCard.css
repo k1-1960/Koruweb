@@ -1,0 +1,40 @@
+.guildcard {
+  background: rgba(84, 135, 157, 0.2);
+  border-radius: 15px;
+  width: 40%;
+  height: 216px;
+  margin: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribuir espacio verticalmente */
+}
+
+.guildcard__img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 128px;
+  z-index: "3";
+  overflow: hidden;
+  align: center;
+  border-radius: 15px;
+  transform: scale(0.9);
+}
+
+.guildcard__body {
+  z-index: 4;
+  padding: 0.4rem;
+  text-align: center;
+}
+
+.guildcard__body__buttons {
+  border-top: 0.5px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  vertical-align: bottom;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto; /* Alinear en la parte inferior */
+}

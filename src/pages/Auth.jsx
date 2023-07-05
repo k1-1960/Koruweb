@@ -56,23 +56,22 @@ export function Login() {
 
 // Con esta función manejamos el codigo que resulta en el proceso de discord.
 export function LoginCallback() {
-  let [credentials, setCredentials] = useState(false);
   useEffect(() => {
-    fetch("https://api.k1a.repl.co/credentials")
-      .then((res) => res.json())
-      .then((res) => {
+    axios({
+      url: "https://api.k1a.repl.co/credentials", method: "GET" })
+      .then(({data}) => {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
 
         // si se encontró el codigo.
         if (code) {
           const requestBody = new URLSearchParams();
-          requestBody.append("client_id", CLIENT_ID);
-          requestBody.append("client_secret", CLIENT_SECRET);
+          requestBody.append("client_id", data.data.CLIENT_ID);
+          requestBody.append("client_secret", data.data.CLIENT_SECRET);
           requestBody.append("grant_type", "authorization_code");
           requestBody.append("code", code);
           requestBody.append("scope", "identify email guilds");
-          requestBody.append("redirect_uri", CALLBACK_URL);
+          requestBody.append("redirect_uri", data.data.CALLBACK_URL);
 
           // Generamos un AccessToken del usuario para hacer peticiones en su nombre.
           fetch("https://discord.com/api/v10/oauth2/token", {

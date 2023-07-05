@@ -11,7 +11,6 @@ export function Login() {
       .then((response) => {
         // Manejar la respuesta exitosa
         setCredentials(response.data.data);
-        
       })
       .catch((error) => {
         console.error(error);
@@ -61,41 +60,41 @@ export function LoginCallback() {
   useEffect(() => {
     fetch("https://api.k1a.repl.co/credentials")
       .then((res) => res.json())
-      .then((res) => setCredentials(res));
+      .then((res) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get("code");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
+        // si se encontró el codigo.
+        if (code) {
+          const requestBody = new URLSearchParams();
+          requestBody.append("client_id", CLIENT_ID);
+          requestBody.append("client_secret", CLIENT_SECRET);
+          requestBody.append("grant_type", "authorization_code");
+          requestBody.append("code", code);
+          requestBody.append("scope", "identify email guilds");
+          requestBody.append("redirect_uri", CALLBACK_URL);
 
-    // si se encontró el codigo.
-    if (code) {
-      const requestBody = new URLSearchParams();
-      requestBody.append("client_id", CLIENT_ID);
-      requestBody.append("client_secret", CLIENT_SECRET);
-      requestBody.append("grant_type", "authorization_code");
-      requestBody.append("code", code);
-      requestBody.append("scope", "identify email guilds");
-      requestBody.append("redirect_uri", CALLBACK_URL);
+          // Generamos un AccessToken del usuario para hacer peticiones en su nombre.
+          fetch("https://discord.com/api/v10/oauth2/token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: requestBody.toString(),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Guardamos los datos necesarios en el navegador del usuario.
+              localStorage.setItem("discord-auth-token", data.access_token);
+              localStorage.setItem("discord-auth-expires_in", data.expires_in);
 
-      // Generamos un AccessToken del usuario para hacer peticiones en su nombre.
-      fetch("https://discord.com/api/v10/oauth2/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: requestBody.toString(),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // Guardamos los datos necesarios en el navegador del usuario.
-          localStorage.setItem("discord-auth-token", data.access_token);
-          localStorage.setItem("discord-auth-expires_in", data.expires_in);
-
-          // Redirigimos al usuario a la pagina principal pero ya autenticado.
-          window.location.href = window.location.origin + "/#";
-        })
-        .catch((error) => {
-          return <div>Error</div>;
-        });
-    }
+              // Redirigimos al usuario a la pagina principal pero ya autenticado.
+              window.location.href = window.location.origin + "/#";
+            })
+            .catch((error) => {
+              return <div>Error</div>;
+            });
+        }
+      });
   }, []);
 }

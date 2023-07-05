@@ -1,8 +1,0 @@
-const { CALLBACK_URL, CLIENT_SECRET, CLIENT_ID } = process.env;
-
-export default {
-  CLIENT_SECRET: CALLBACK_URL,
-  CLIENT_ID: CLIENT_ID,
-  CALLBACK_URL:
-    CALLBACK_URL,
-};

@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Link, Button, Text } from "@nextui-org/react";
-import env from "./env.js";
-
-// Pantalla de login, solo muestra un botón. Si ya está logeado lo redirige a la pagina inicial (uso HashRouter de react-router-dom).
-
-const { CALLBACK_URL, CLIENT_SECRET, CLIENT_ID } = env;
-
-// alert(JSON.stringify({ CALLBACK_URL, CLIENT_SECRET, CLIENT_ID }));
-
+import { Link, Button, Text, Loading } from "@nextui-org/react";
+import axios from "axios";
 export function Login() {
-  const handleLogin = () => {
-    window.location.href = String(
-      "https://discord.com/api/oauth2/authorize?client_id=TU_CLIENT_ID&redirect_uri=TU_REDIRECT_URI&response_type=code&scope=identify%20email%20guilds"
-        .replace("TU_CLIENT_ID", CLIENT_ID)
-        .replace("TU_REDIRECT_URI", encodeURIComponent(CALLBACK_URL))
-    );
-  };
+  let [credentials, setCredentials] = useState(false);
+  useEffect(() => {
+    axios({
+      url: "https://api.k1a.repl.co/credentials",
+      method: "GET",
+    })
+      .then((response) => {
+        // Manejar la respuesta exitosa
+        setCredentials(response.data.data);
+        
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
   // Sí ya está logeado.
   if (localStorage.getItem("discord-auth-token")) {
     // Redirección.
@@ -29,9 +30,26 @@ export function Login() {
         <Text h6>
           (Don't worry, we don't have access to your login credentials.)
         </Text>
-        <Button onPress={handleLogin} flat="true" auto="true">
-          Go to Discord
-        </Button>
+        {credentials ? (
+          <Button
+            as={Link}
+            href={
+              "https://discord.com/api/oauth2/authorize?client_id=" +
+              credentials.CLIENT_ID +
+              "&redirect_uri=" +
+              encodeURIComponent(credentials.CALLBACK_URL) +
+              "&response_type=code&scope=identify%20email%20guilds"
+            }
+            flat="true"
+            auto="true"
+          >
+            Go to Discord
+          </Button>
+        ) : (
+          <Button disabled auto bordered color="primary" css={{ px: "$13" }}>
+            <Loading color="currentColor" size="sm" />
+          </Button>
+        )}
       </>
     );
   }
@@ -39,8 +57,12 @@ export function Login() {
 
 // Con esta función manejamos el codigo que resulta en el proceso de discord.
 export function LoginCallback() {
+  let [credentials, setCredentials] = useState(false);
   useEffect(() => {
-    // Obtiene el código de autorización de la URL
+    fetch("https://api.k1a.repl.co/credentials")
+      .then((res) => res.json())
+      .then((res) => setCredentials(res));
+
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
 

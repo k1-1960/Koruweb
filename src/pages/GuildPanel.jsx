@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   Input,
   Loading,
   styled,
+  useTheme,
 } from "@nextui-org/react";
 import { ArrowLeftSquare } from "react-iconly";
 import RequestLogin from "../components/RequestLogin.jsx";
@@ -29,7 +30,7 @@ const Center = styled("div", {
 
 function Notification({ id }) {
   return (
-    <div id="notification-bc" style={{ padding: "2px", display: "none" }}>
+    <div id={id} style={{ padding: "2px", display: "none" }}>
       <Text
         blockquote
         color="success"
@@ -46,11 +47,14 @@ function Notification({ id }) {
 
 function GuildPanel() {
   const token = localStorage.getItem("discord-auth-token");
-
+  const { isDark, type, theme } = useTheme();
+  const inherit = isDark ? "white" : "black";
   if (token) {
     const params = useParams();
     const [user, setUser] = useState(false);
     const [guild, setGuild] = useState(false);
+    const imageInputRef = useRef(null);
+
     useEffect(() => {
       axios({
         url: "https://discord.com/api/v10/users/@me",
@@ -77,6 +81,38 @@ function GuildPanel() {
         })
         .catch((error) => {});
     }, []);
+
+    function handleImageUpload(imgdata, ip) {
+      alert(ip);
+      const file = imgdata;
+      const url = `http://${ip}/upload?imageName=${params.guildid}`; // URL de la ruta de subida de imágenes en tu servidor
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        axios.get("http://" + ip + "/upload", {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            Origin: "http://localhost:3000"
+          }
+        });
+        axios({
+          url,
+          method: "POST",
+          data: {
+            image: file,
+          },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Origin: "http://localhost:3000",
+          },
+        }).catch((error) => console.log(error));
+      } catch (error) {
+        alert("error");
+        console.error(error);
+      }
+    }
 
     function handleBotCustomizationForm(e, userr) {
       let change = false;
@@ -113,13 +149,60 @@ function GuildPanel() {
         setTimeout(() => (notification.style.display = "none"), 5000);
       }
     }
+    function handleWelcomeConfig(e, userr) {
+      let change = false;
+      let requestData = {};
+      let notification = document.getElementById("notification-wc");
+      let newTitle = document.getElementById("card-title") || "";
+      let newSubtitle = document.getElementById("card-subtitle") || "";
+      let newBackground = document.getElementById("card-background") || false;
+      if (newTitle.value !== (guild.db.configurations.welcome.title || "")) {
+        change = true;
+        guild.db.configurations.title = newTitle.value;
+        requestData["configurations.welcome.title"] = newTitle.value;
+        alert(JSON.stringify(requestData));
+      }
+
+      if (newSubtitle.value !== (guild.db.configurations.subtitle || "")) {
+        change = true;
+        guild.db.configurations.subtitle = newSubtitle.value;
+        requestData["configurations.welcome.subtitle"] = newSubtitle.value;
+      }
+      if (imageInputRef.current.files[0]) {
+        axios
+          .get("https://api.k1a.repl.co/ip")
+          .then(({ data }) => {
+            handleImageUpload(imageInputRef.current.files[0], data);
+          })
+          .catch((err) => console.log(err));
+      }
+
+      if (change === true) {
+        axios({
+          method: "PUT",
+          url:
+            "https://api.k1a.repl.co/guilds/" +
+            params.guildid +
+            "?userid=" +
+            userr.id +
+            "&guildid=" +
+            params.guildid,
+          data: requestData,
+        })
+          .then((res) => console.log(res.data))
+          .catch((err) => console.log(err));
+
+        notification.style.display = "";
+        setTimeout(() => (notification.style.display = "none"), 5000);
+      }
+    }
 
     return (
       <Regular>
         <div>
           <Button
             size="xs"
-            icon={<ArrowLeftSquare set="bold" primaryColor="inherit" />}
+            icon={<ArrowLeftSquare set="bold" primaryColor={inherit} />}
             b
             as={Link}
             light
@@ -166,17 +249,43 @@ function GuildPanel() {
               <Collapse
                 subtitle="Available soon!"
                 title="Welcomes configuration"
-                disabled
               >
                 <Notification id="notification-wc" />
                 <form>
                   <Input
                     id="card-title"
                     label="Card title"
-                    placeholder={
-                      guild.db.configurations.basic.custom_nick || ""
-                    }
+                    initialValue={guild.db.configurations.welcome.title || ""}
+                    underlined
                   />
+                  <Spacer y={2} />
+                  <Input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    label="Card background"
+                    underlined
+                  />
+                  <Spacer y={1} />
+                  <Text h6>Actual background</Text>
+                  <img
+                    src={
+                      "https://api.k1a.repl.co/guilds/" +
+                      params.guildid +
+                      "/welcomebg"
+                    }
+                    loading="lazy"
+                    width="512px"
+                  />
+                  <Spacer y={1} />
+                  <Button
+                    flat
+                    auto
+                    onPress={(e) => handleWelcomeConfig(e, user)}
+                    color="$white"
+                  >
+                    Submit
+                  </Button>
                 </form>
               </Collapse>
             </Collapse.Group>

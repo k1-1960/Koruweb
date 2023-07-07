@@ -91,7 +91,7 @@ function Profile() {
         })
           .then((res) => res.json())
           .then((data) => {
-            setGuilds(data);
+            setGuilds(data.filter((guild) => guild.permissions & 0x00000008));
           });
 
         fetch("https://api.k1a.repl.co/bot/guilds?userid=anonimous", {
@@ -136,9 +136,8 @@ function Profile() {
         {guilds && botGuilds ? (
           <GuildsDisplay>
             {guilds
-              .filter((guild) => guild.permissions & 0x00000008)
               .sort((a, b) => {
-                if (botGuilds.includes(a.id) && !botGuilds.includes(b.id)) {
+                if(botGuilds.includes(a.id) && !botGuilds.includes(b.id)) {
                   return -1; // a debe ir antes que b
                 } else if (
                   !botGuilds.includes(a.id) &&

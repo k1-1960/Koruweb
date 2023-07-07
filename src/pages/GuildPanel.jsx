@@ -109,7 +109,7 @@ function GuildPanel() {
             "Content-Type": "multipart/form-data",
             Origin: window.location.origin,
           },
-        })
+        });
         axios({
           url:
             "https://api.k1a.repl.co/makerequest?guildid=" +
@@ -142,6 +142,26 @@ function GuildPanel() {
       if (newNick.value !== (guild.bot.nick || "")) {
         change = true;
         guild.bot.nick = newNick.value;
+        console.log({
+          method: "POST",
+          url:
+            "https://api.k1a.repl.co/makerequest?guildid=" +
+            params.guildid +
+            "&userid=" +
+            userr.id,
+          data: {
+            url:
+              "https://" +
+              `discord.com/api/v10/guilds/${params.guildid}/members/@me`,
+            method: "PATCH",
+            headers: {
+              Authorization: "PROCESS_ENV_TOKEN",
+            },
+            data: {
+              nick: newNick.value,
+            },
+          },
+        })
         axios({
           method: "POST",
           url:

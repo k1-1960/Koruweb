@@ -91,21 +91,19 @@ function GuildPanel() {
       formData.append("image", file);
 
       try {
-        axios.get("http://" + ip + "/upload", {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            Origin: "http://localhost:3000"
-          }
-        });
         axios({
-          url,
+          url: "https://api.k1a.repl.co/makerequest",
           method: "POST",
           data: {
+            url,
+            method: "POST",
+            data: {
             image: file,
+            }
           },
           headers: {
             "Content-Type": "multipart/form-data",
-            Origin: "http://localhost:3000",
+            Origin: window.location.origin,
           },
         }).catch((error) => console.log(error));
       } catch (error) {

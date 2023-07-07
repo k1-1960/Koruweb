@@ -26,11 +26,17 @@ export default function GuildCard({ guild, invite }) {
       </div>
       <div className="guildcard__body__buttons">
         {!invite ? (
-          <Button size="sm" auto light color="warning">
+          <Button size="sm" onPress={() => window.location.href = "https://" + `discord.com/api/oauth2/authorize?client_id=1123149255410978816&permissions=395409091702&guild_id=${guild.id}&disable_guild_select=true&scope=bot%20identify%20guilds`} auto light color="warning">
             Invite
           </Button>
         ) : (
-          <Button size="sm" auto light color="primary">
+          <Button
+            size="sm"
+            onPress={() => window.location.href = window.location.origin + "/#/guild/" + guild.id}
+            auto
+            light
+            color="primary"
+          >
             Settings
           </Button>
         )}

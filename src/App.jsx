@@ -7,6 +7,7 @@ import "./App.css";
 
 import Home from "./pages/Home.jsx";
 import Profile from "./pages/Profile.jsx";
+import GuildPanel from "./pages/GuildPanel.jsx";
 import { Login, LoginCallback, Logout } from "./pages/Auth.jsx";
 import Navbar from "./components/Navbar.jsx";
 
@@ -16,14 +17,7 @@ const lightTheme = createTheme({
     colors: {
       background: "#ffffff",
       text: "#000000",
-    },
-    shadows: {
-      xs: "0 2px 8px 1px rgb(104 112 118 / 0.07), 0 1px 1px -1px rgb(104 112 118 / 0.04)",
-      sm: "0 2px 8px 2px rgb(104 112 118 / 0.07), 0 2px 4px -1px rgb(104 112 118 / 0.04)",
-      md: "0 12px 20px 6px rgb(104 112 118 / 0.08)",
-      lg: "0 12px 34px 6px rgb(104 112 118 / 0.18)",
-      xl: "0 25px 65px 0px rgb(104 112 118 / 0.35)",
-    },
+    }
   },
 });
 
@@ -34,13 +28,7 @@ const darkTheme = createTheme({
       background: "#000000",
       text: "#ffffff",
     },
-    shadows: {
-      xs: "0 2px 8px 1px rgb(104 112 118 / 0.07), 0 1px 1px -1px rgb(104 112 118 / 0.04)",
-      sm: "0 2px 8px 2px rgb(104 112 118 / 0.07), 0 2px 4px -1px rgb(104 112 118 / 0.04)",
-      md: "0 12px 20px 6px rgb(104 112 118 / 0.08)",
-      lg: "0 12px 34px 6px rgb(104 112 118 / 0.18)",
-      xl: "0 25px 65px 0px rgb(104 112 118 / 0.35)",
-    },
+    
   },
 });
 
@@ -66,6 +54,7 @@ function App() {
               <Route exact path="/" element={<Home />} />
               <Route exact path="/profile" element={<Profile />} />
               <Route exact path="/login" element={<Login />} />
+              <Route path="/guild/:guildid" Component={GuildPanel} />
               <Route
                 exact
                 path="/auth/discord/process-token"

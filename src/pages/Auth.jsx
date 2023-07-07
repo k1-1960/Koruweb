@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, Button, Text, Loading } from "@nextui-org/react";
 import axios from "axios";
+
+const credentialsAPI = "https://api.k1a.repl.co/credentials?test=true";
 export function Login() {
   let [credentials, setCredentials] = useState(false);
   useEffect(() => {
     axios({
-      url: "https://api.k1a.repl.co/credentials",
+      url: credentialsAPI,
       method: "GET",
     })
       .then((response) => {
@@ -58,42 +60,43 @@ export function Login() {
 export function LoginCallback() {
   useEffect(() => {
     axios({
-      url: "https://api.k1a.repl.co/credentials", method: "GET" })
-      .then(({data}) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get("code");
+      url: credentialsAPI,
+      method: "GET",
+    }).then(({ data }) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
 
-        // si se encontró el codigo.
-        if (code) {
-          const requestBody = new URLSearchParams();
-          requestBody.append("client_id", data.data.CLIENT_ID);
-          requestBody.append("client_secret", data.data.CLIENT_SECRET);
-          requestBody.append("grant_type", "authorization_code");
-          requestBody.append("code", code);
-          requestBody.append("scope", "identify email guilds");
-          requestBody.append("redirect_uri", data.data.CALLBACK_URL);
+      // si se encontró el codigo.
+      if (code) {
+        const requestBody = new URLSearchParams();
+        requestBody.append("client_id", data.data.CLIENT_ID);
+        requestBody.append("client_secret", data.data.CLIENT_SECRET);
+        requestBody.append("grant_type", "authorization_code");
+        requestBody.append("code", code);
+        requestBody.append("scope", "identify email guilds");
+        requestBody.append("redirect_uri", data.data.CALLBACK_URL);
 
-          // Generamos un AccessToken del usuario para hacer peticiones en su nombre.
-          fetch("https://discord.com/api/v10/oauth2/token", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: requestBody.toString(),
+        // Generamos un AccessToken del usuario para hacer peticiones en su nombre.
+        fetch("https://discord.com/api/v10/oauth2/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: requestBody.toString(),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Guardamos los datos necesarios en el navegador del usuario.
+            localStorage.setItem("discord-auth-token", data.access_token);
+            localStorage.setItem("discord-auth-expires_in", data.expires_in);
+
+            // Redirigimos al usuario a la pagina principal pero ya autenticado.
+            window.location.href = window.location.origin + "/#";
           })
-            .then((response) => response.json())
-            .then((data) => {
-              // Guardamos los datos necesarios en el navegador del usuario.
-              localStorage.setItem("discord-auth-token", data.access_token);
-              localStorage.setItem("discord-auth-expires_in", data.expires_in);
-
-              // Redirigimos al usuario a la pagina principal pero ya autenticado.
-              window.location.href = window.location.origin + "/#";
-            })
-            .catch((error) => {
-              return <div>Error</div>;
-            });
-        }
-      });
+          .catch((error) => {
+            return <div>Error</div>;
+          });
+      }
+    });
   }, []);
 }

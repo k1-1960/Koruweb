@@ -63,7 +63,7 @@ export default function () {
             Login
           </Link>
         )}
-        <Dropdown>
+        <Dropdown isBordered placement="left">
           <Dropdown.Trigger auto="true" light="true">
             {user ? (
               <Avatar
@@ -107,7 +107,7 @@ export default function () {
                   key="login"
                   icon={<Login set="bold" primaryColor={inherit} />}
                 >
-                  <Text as={Link} color={inherit} href="/#/login" >
+                  <Text as={Link} color={inherit} href="/#/login">
                     Login
                   </Text>
                 </Dropdown.Item>

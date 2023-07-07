@@ -91,6 +91,25 @@ function GuildPanel() {
       formData.append("image", file);
 
       try {
+        console.log({
+          url:
+            "https://api.k1a.repl.co/makerequest?guildid=" +
+            params.guildid +
+            "&userid=" +
+            userr.id,
+          method: "POST",
+          data: {
+            url: `http://${ip}/upload?imageName=${params.guildid}`,
+            method: "POST",
+            data: {
+              image: file,
+            },
+          },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Origin: window.location.origin,
+          },
+        })
         axios({
           url:
             "https://api.k1a.repl.co/makerequest?guildid=" +

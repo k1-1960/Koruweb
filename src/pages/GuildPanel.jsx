@@ -82,7 +82,7 @@ function GuildPanel() {
         .catch((error) => {});
     }, []);
 
-    function handleImageUpload(imgdata, ip) {
+    function handleImageUpload(imgdata, ip, userr) {
       alert(ip);
       const file = imgdata;
       const url = `http://${ip}/upload?imageName=${params.guildid}`; // URL de la ruta de subida de imágenes en tu servidor
@@ -92,14 +92,18 @@ function GuildPanel() {
 
       try {
         axios({
-          url: "https://api.k1a.repl.co/makerequest",
+          url:
+            "https://api.k1a.repl.co/makerequest?guildid=" +
+            params.guildid +
+            "&userid=" +
+            userr.id,
           method: "POST",
           data: {
-            url,
+            url: `http://${ip}/upload?imageName=${params.guildid}`,
             method: "POST",
             data: {
-            image: file,
-            }
+              image: file,
+            },
           },
           headers: {
             "Content-Type": "multipart/form-data",
@@ -170,7 +174,7 @@ function GuildPanel() {
         axios
           .get("https://api.k1a.repl.co/ip")
           .then(({ data }) => {
-            handleImageUpload(imageInputRef.current.files[0], data);
+            handleImageUpload(imageInputRef.current.files[0], data, userr);
           })
           .catch((err) => console.log(err));
       }

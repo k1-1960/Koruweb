@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, Button, Text, Loading } from "@nextui-org/react";
 import axios from "axios";
 
-const credentialsAPI = "https://api.k1a.repl.co/credentials?test=true";
+const credentialsAPI = "https://api.k1a.repl.co/credentials";
 export function Login() {
   let [credentials, setCredentials] = useState(false);
   useEffect(() => {
